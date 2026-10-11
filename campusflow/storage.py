@@ -18,3 +18,10 @@ def load_tickets(path: str = "tickets.json") -> list[dict]:
         raise ValueError(f"{path} must contain a JSON list of tickets.")
 
     return tickets
+
+
+def save_tickets(tickets: list[dict], path: str = "tickets.json") -> None:
+    """Save tickets to a JSON file."""
+    with open(path, "w", encoding="utf-8") as file:
+        json.dump(tickets, file, indent=4)
+
