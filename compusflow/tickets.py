@@ -100,3 +100,34 @@ def find_ticket(tickets: list[dict], ticket_id: str) -> dict:
 
     raise LookupError(f"Ticket '{ticket_id}' not found.")
 
+
+def create_ticket(
+    tickets: list[dict],
+    title: str,
+    category: str,
+    urgency: str,
+    affected_users: int,
+) -> dict:
+    """Validate input, create a ticket, append it, and return it."""
+    # Validate each input once before changing the shared list.
+    title = validate_title(title)
+    category = validate_category(category)
+    urgency = validate_urgency(urgency)
+    affected_users = validate_affected_users(affected_users)
+
+    priority = calculate_priority(urgency, affected_users)
+    ticket_id = generate_ticket_id(tickets)
+
+    new_ticket = {
+        "id": ticket_id,
+        "title": title,
+        "category": category,
+        "urgency": urgency,
+        "affected_users": affected_users,
+        "priority": priority,
+        "status": "open",
+        "assigned_to": None,
+    }
+
+    tickets.append(new_ticket)
+    return new_ticket
