@@ -54,3 +54,21 @@ def validate_affected_users(count: int) -> int:
         raise ValueError("Affected users must be greater than zero.")
 
     return count
+
+
+
+def calculate_priority(urgency: str, affected_users: int) -> str:
+    """Return priority based on validated urgency and user count."""
+    urgency = validate_urgency(urgency)
+    affected_users = validate_affected_users(affected_users)
+
+    if urgency == "high" and affected_users >= 10:
+        return "critical"
+
+    if urgency == "high" or affected_users >= 10:
+        return "high"
+
+    if urgency == "medium" or affected_users >= 3:
+        return "medium"
+
+    return "low"
