@@ -72,3 +72,31 @@ def calculate_priority(urgency: str, affected_users: int) -> str:
         return "medium"
 
     return "low"
+
+
+
+def generate_ticket_id(tickets: list[dict]) -> str:
+    """Generate the next ID using the highest existing numeric ID."""
+    highest_id = 0
+
+    for ticket in tickets:
+        ticket_id = ticket.get("id", "")
+
+        if (
+            isinstance(ticket_id, str)
+            and ticket_id.startswith("T")
+            and ticket_id[1:].isdigit()
+        ):
+            highest_id = max(highest_id, int(ticket_id[1:]))
+
+    return f"T{highest_id + 1:03d}"
+
+
+def find_ticket(tickets: list[dict], ticket_id: str) -> dict:
+    """Return a ticket by ID or raise LookupError."""
+    for ticket in tickets:
+        if ticket["id"] == ticket_id:
+            return ticket
+
+    raise LookupError(f"Ticket '{ticket_id}' not found.")
+
