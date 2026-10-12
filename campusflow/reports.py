@@ -1,20 +1,4 @@
 
-
-Skip to content
-Using Gmail with screen readers
-2 of 1,167
-storage
-Inbox
-Emmanuel Okonkwo <okonkwopaul348@gmail.com>
-	
-Attachments11:38 AM (1 hour ago)
-	
-	
-to me
-
- 3 Attachments
-  •  Scanned by Gmail
-
 VALID_STATUSES = {"open", "in_progress", "resolved"}
 VALID_PRIORITIES = {"critical", "high", "medium", "low"}
 
@@ -56,6 +40,3 @@ def generate_report(tickets: list[dict]) -> dict:
         report["by_priority"][priority] += 1
 
     return report
-
-report.py
-Displaying test_storage.py.

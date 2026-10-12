@@ -1,20 +1,4 @@
 
-
-Skip to content
-Using Gmail with screen readers
-1 of 1,167
-main and report
-Inbox
-Emmanuel Okonkwo <okonkwopaul348@gmail.com>
-	
-Attachments11:50 AM (51 minutes ago)
-	
-	
-to me
-
- 4 Attachments
-  •  Scanned by Gmail
-
 import unittest
 
 from campusflow.reports import generate_report
@@ -144,6 +128,3 @@ class ReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-test_report.py
-Displaying main.py.

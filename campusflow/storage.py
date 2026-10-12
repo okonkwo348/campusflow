@@ -1,20 +1,3 @@
-
-
-Skip to content
-Using Gmail with screen readers
-2 of 1,167
-storage
-Inbox
-Emmanuel Okonkwo <okonkwopaul348@gmail.com>
-	
-Attachments11:38 AM (1 hour ago)
-	
-	
-to me
-
- 3 Attachments
-  •  Scanned by Gmail
-
 import json
 import re
 
@@ -138,6 +121,3 @@ def save_tickets(
     with open(path, "w", encoding="utf-8") as file:
         json.dump(tickets, file, indent=4)
         file.write("\n")
-
-storage.py
-Displaying storage.py.

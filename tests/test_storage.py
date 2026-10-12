@@ -1,20 +1,3 @@
-
-
-Skip to content
-Using Gmail with screen readers
-2 of 1,167
-storage
-Inbox
-Emmanuel Okonkwo <okonkwopaul348@gmail.com>
-	
-Attachments11:38 AM (1 hour ago)
-	
-	
-to me
-
- 3 Attachments
-  •  Scanned by Gmail
-
 import json
 import os
 import tempfile
@@ -304,6 +287,3 @@ class ReportTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-
-test_storage.py
-Displaying test_storage.py.
