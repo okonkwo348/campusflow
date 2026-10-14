@@ -16,7 +16,6 @@ SAMPLE_TICKET = {
     "priority": "critical",
     "status": "open",
     "assigned_to": None,
-    "notes": [],
 }
 
 
