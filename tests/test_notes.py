@@ -126,6 +126,18 @@ class TestNoteStorage(unittest.TestCase):
             with self.assertRaises(ValueError):
                 load_tickets(path)
 
+    def test_new_ticket_after_reload_gets_next_id(self):
+        tickets = []
+        create_ticket(tickets, "Wi-Fi is down", "Network", "high", 15)
+        create_ticket(tickets, "Broken laptop", "Hardware", "low", 1)
+
+        with tempfile.TemporaryDirectory() as folder:
+            path = os.path.join(folder, "tickets.json")
+            save_tickets(tickets, path)
+            reloaded = load_tickets(path)
+
+        new_ticket = create_ticket(reloaded, "Printer jam", "Hardware", "low", 1)
+        self.assertEqual(new_ticket["id"], "T003")
 
 if __name__ == "__main__":
     unittest.main()

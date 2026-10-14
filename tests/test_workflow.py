@@ -332,6 +332,19 @@ class TestWorkflow(unittest.TestCase):
         self.assertEqual([ticket["id"] for ticket in queue], ["T002"])
 
 
+    def test_assignment_does_not_change_status(self):
+        ticket = assign_ticket(self.tickets, "T001", "Mary")
+
+        self.assertEqual(ticket["status"], "open")
+
+    def test_full_lifecycle_including_reopen(self):
+        assign_ticket(self.tickets, "T001", "Mary")
+        change_status(self.tickets, "T001", "in_progress")
+        change_status(self.tickets, "T001", "resolved")
+        ticket = change_status(self.tickets, "T001", "open")
+
+        self.assertEqual(ticket["status"], "open")
+        self.assertEqual(ticket["assigned_to"], "Mary")
 if __name__ == "__main__":
     unittest.main()
 
