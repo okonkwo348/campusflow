@@ -1,42 +1,33 @@
 
-VALID_STATUSES = {"open", "in_progress", "resolved"}
-VALID_PRIORITIES = {"critical", "high", "medium", "low"}
+STATUSES = ("open", "in_progress", "resolved")
+PRIORITIES = ("critical", "high", "medium", "low")
+CATEGORIES = ("Network", "Hardware", "Software", "Other")
 
 
-def generate_report(tickets: list[dict]) -> dict:
-    """Return total tickets and counts by status and priority."""
-    if not isinstance(tickets, list):
-        raise ValueError("Tickets must be provided as a list.")
-
+def generate_report(tickets):
     report = {
         "total_tickets": len(tickets),
-        "by_status": {
-            "open": 0,
-            "in_progress": 0,
-            "resolved": 0,
-        },
-        "by_priority": {
-            "critical": 0,
-            "high": 0,
-            "medium": 0,
-            "low": 0,
-        },
+        "by_status": {status: 0 for status in STATUSES},
+        "by_priority": {priority: 0 for priority in PRIORITIES},
+        "by_category": {category: 0 for category in CATEGORIES},
+        "unresolved": 0,
+        "resolved": 0,
+        "resolution_percentage": 0.0,
     }
 
     for ticket in tickets:
-        if not isinstance(ticket, dict):
-            raise ValueError("Every ticket must be a dictionary.")
+        report["by_status"][ticket["status"]] += 1
+        report["by_priority"][ticket["priority"]] += 1
+        report["by_category"][ticket["category"]] += 1
 
-        status = ticket.get("status")
-        priority = ticket.get("priority")
+        if ticket["status"] == "resolved":
+            report["resolved"] += 1
+        else:
+            report["unresolved"] += 1
 
-        if status not in VALID_STATUSES:
-            raise ValueError(f"Invalid ticket status: {status!r}")
-
-        if priority not in VALID_PRIORITIES:
-            raise ValueError(f"Invalid ticket priority: {priority!r}")
-
-        report["by_status"][status] += 1
-        report["by_priority"][priority] += 1
+    if report["total_tickets"] > 0:
+        report["resolution_percentage"] = (
+            report["resolved"] / report["total_tickets"]
+        ) * 100
 
     return report
