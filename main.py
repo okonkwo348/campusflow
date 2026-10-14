@@ -1,7 +1,10 @@
 from campusflow.tickets import create_ticket
 from campusflow.workflow import assign_ticket, change_status, build_queue
 from campusflow.storage import load_tickets, save_tickets
+from campusflow.search import search_tickets
 from campusflow.reports import generate_report
+from campusflow.engineering_quiz import run_quiz
+from campusflow.tickets import add_note, get_ticket_notes
 
 
 def display_tickets(tickets: list[dict]) -> None:
@@ -31,6 +34,106 @@ def save_changes(tickets: list[dict]) -> bool:
         return False
 
 
+def search_menu(tickets):
+    query = input("Title search (leave blank for all titles): ")
+
+    category = input(
+        "Category (Network/Hardware/Software/Other, blank for any): "
+    ).strip()
+
+    status = input(
+        "Status (open/in_progress/resolved, blank for any): "
+    ).strip()
+
+    priority = input(
+        "Priority (critical/high/medium/low, blank for any): "
+    ).strip()
+
+    try:
+        results = search_tickets(
+            tickets,
+            query=query,
+            category=category or None,
+            status=status or None,
+            priority=priority or None,
+        )
+    except ValueError as error:
+        print(f"Search error: {error}")
+        return
+
+    if not results:
+        print("No matching tickets found.")
+        return
+
+    for ticket in results:
+        print(
+            f"{ticket['id']} | {ticket['title']} | "
+            f"{ticket['category']} | {ticket['priority']} | "
+            f"{ticket['status']} | Assigned: "
+            f"{ticket['assigned_to'] or 'Unassigned'}"
+        )
+
+
+def report_menu(tickets):
+    report = generate_report(tickets)
+
+    print("\n--- TICKET ANALYTICS ---")
+    print(f"Total tickets: {report['total_tickets']}")
+
+    print("\nBy status:")
+    for status, count in report["by_status"].items():
+        print(f"  {status}: {count}")
+
+    print("\nBy priority:")
+    for priority, count in report["by_priority"].items():
+        print(f"  {priority}: {count}")
+
+    print("\nBy category:")
+    for category, count in report["by_category"].items():
+        print(f"  {category}: {count}")
+
+    print(f"\nUnresolved: {report['unresolved']}")
+    print(f"Resolved: {report['resolved']}")
+    print(
+        "Resolution percentage: "
+        f"{report['resolution_percentage']:.1f}%"
+    )
+
+
+def add_note_menu(tickets):
+    ticket_id = input("Ticket ID: ").strip()
+    author = input("Author: ").strip()
+    message = input("Note: ").strip()
+
+    try:
+        note = add_note(tickets, ticket_id, author, message)
+    except (ValueError, LookupError) as error:
+        print(f"Could not add note: {error}")
+        return
+
+    print(f"Note {note['note_id']} added successfully.")
+
+
+def view_notes_menu(tickets):
+    ticket_id = input("Ticket ID: ").strip()
+
+    try:
+        notes = get_ticket_notes(tickets, ticket_id)
+    except LookupError as error:
+        print(f"Could not find ticket: {error}")
+        return
+
+    if not notes:
+        print("This ticket has no notes.")
+        return
+
+    for note in notes:
+        print(
+            f"{note['note_id']} | {note['author']}: "
+            f"{note['message']}"
+        )
+
+
 def main() -> None:
     """Load tickets and run the CampusFlow CLI."""
     try:
@@ -43,37 +146,29 @@ def main() -> None:
 
     while True:
         print("\n=== CampusFlow ===")
-        print("1. View all tickets")
-        print("2. View ticket report")
-        print("3. Create ticket")
-        print("4. Assign ticket")
-        print("5. Change ticket status")
-        print("6. View work queue")
-        print("7. Save tickets")
-        print("8. Exit")
+        print("F1. CREATE tickets")
+        print("F2. LIST / VIEW report")
+        print("F3. ASSIGN ticket to staff")
+        print("F4. WORKFLOW ticket")
+        print("F5.  WORK QUEUE of ticket")
+        print("F6.  REPORTS of ticket")
+        print("F7.  PERSISTENCE-Save tickets")
+        print("F8. SEARCH")
+        print("F9. ADD_NOTE")
+        print("F10. VIEW_NOTES")
+        print("F11 QUIZ")
+        print("F12. Exit")
 
-        choice = input("Choose an option: ").strip()
+        choice = input("Choose an option (F1-F12): ").strip().upper()
 
-        if choice == "1":
-            display_tickets(tickets)
-
-        elif choice == "2":
-            report = generate_report(tickets)
-
-            print(f'Total tickets: {report["total_tickets"]}')
-            print("By status:", report["by_status"])
-            print("By priority:", report["by_priority"])
-
-        elif choice == "3":
+        if choice in ("F1", "1"):
             try:
                 title = input("Ticket title: ")
                 category = input(
                     "Category (Network, Hardware, Software, Other): "
                 )
                 urgency = input("Urgency (low, medium, high): ")
-
-                affected_users_text = input("Number of affected users: ")
-                affected_users = int(affected_users_text)
+                affected_users = int(input("Number of affected users: "))
 
                 ticket = create_ticket(
                     tickets,
@@ -88,30 +183,31 @@ def main() -> None:
                     f'(Priority: {ticket["priority"]})'
                 )
                 save_changes(tickets)
-
             except ValueError as error:
                 print(f"Could not create ticket: {error}")
 
-        elif choice == "4":
+        elif choice in ("F2", "2"):
+            display_tickets(tickets)
+
+        elif choice in ("F3", "3"):
             ticket_id = input("Ticket ID: ").strip()
             staff_name = input("Staff name: ").strip()
-
             try:
                 ticket = assign_ticket(tickets, ticket_id, staff_name)
-                print(f'Ticket {ticket["id"]} assigned to {ticket["assigned_to"]}.')
+                print(
+                    f'Ticket {ticket["id"]} assigned to '
+                    f'{ticket["assigned_to"]}.'
+                )
                 save_changes(tickets)
-
             except (ValueError, LookupError) as error:
                 print(f"Could not assign ticket: {error}")
 
-        elif choice == "5":
+        elif choice in ("F4", "4"):
             ticket_id = input("Ticket ID: ").strip()
-
-            print("Available status actions:")
+            print("Available workflow actions:")
             print("1. Start work (in_progress)")
             print("2. Resolve ticket (resolved)")
             print("3. Reopen ticket (open)")
-
             status_choice = input("Choose an action: ").strip()
 
             status_options = {
@@ -119,11 +215,10 @@ def main() -> None:
                 "2": "resolved",
                 "3": "open",
             }
-
             new_status = status_options.get(status_choice)
 
             if new_status is None:
-                print("Invalid status action.")
+                print("Invalid workflow action.")
                 continue
 
             try:
@@ -133,26 +228,39 @@ def main() -> None:
                     f'to {ticket["status"]}.'
                 )
                 save_changes(tickets)
-
             except (ValueError, LookupError) as error:
                 print(f"Could not change ticket status: {error}")
 
-        elif choice == "6":
-            queue = build_queue(tickets)
-            display_tickets(queue)
+        elif choice in ("F5", "5"):
+            display_tickets(build_queue(tickets))
 
-        elif choice == "7":
+        elif choice in ("F6", "6"):
+            report_menu(tickets)
+
+        elif choice in ("F7", "7"):
             save_changes(tickets)
 
-        elif choice == "8":
+        elif choice in ("F8", "8"):
+            search_menu(tickets)
+
+        elif choice in ("F9", "9"):
+            add_note_menu(tickets)
+            save_changes(tickets)
+
+        elif choice in ("F10", "10"):
+            view_notes_menu(tickets)
+
+        elif choice in ("F11", "11"):
+            run_quiz()
+
+        elif choice in ("F12", "12", "EXIT", "Q"):
             if save_changes(tickets):
                 print("Goodbye!")
                 break
-
             print("Exit cancelled so you can retry saving.")
 
         else:
-            print("Invalid option. Please choose 1-8.")
+            print("Invalid option. Please choose F1-F12.")
 
 
 if __name__ == "__main__":
