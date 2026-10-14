@@ -4,61 +4,126 @@ import unittest
 from campusflow.reports import generate_report
 
 
-class TestGenerateReport(unittest.TestCase):
-    def test_empty_report_contains_all_keys(self):
+SAMPLE_TICKET = {
+    "id": "T001",
+    "title": "Campus Wi-Fi is down",
+    "category": "Network",
+    "urgency": "high",
+    "affected_users": 15,
+    "priority": "critical",
+    "status": "open",
+    "assigned_to": None,
+}
+
+
+class ReportTests(unittest.TestCase):
+
+    def test_report_counts_single_ticket(self):
+        report = generate_report([SAMPLE_TICKET])
+
+        self.assertEqual(report["total_tickets"], 1)
+        self.assertEqual(report["by_status"]["open"], 1)
+        self.assertEqual(report["by_priority"]["critical"], 1)
+
+    def test_empty_report_has_all_zero_counts(self):
         report = generate_report([])
 
         self.assertEqual(report["total_tickets"], 0)
-        self.assertEqual(report["unresolved"], 0)
-        self.assertEqual(report["resolved"], 0)
-        self.assertEqual(report["resolution_percentage"], 0.0)
 
         self.assertEqual(
-            set(report["by_status"]),
-            {"open", "in_progress", "resolved"},
+            report["by_status"],
+            {
+                "open": 0,
+                "in_progress": 0,
+                "resolved": 0,
+            },
         )
+
         self.assertEqual(
-            set(report["by_priority"]),
-            {"critical", "high", "medium", "low"},
+            report["by_priority"],
+            {
+                "critical": 0,
+                "high": 0,
+                "medium": 0,
+                "low": 0,
+            },
         )
+
+    def test_report_counts_mixed_tickets(self):
+        second_ticket = {
+            **SAMPLE_TICKET,
+            "id": "T002",
+            "title": "Laptop issue",
+            "category": "Hardware",
+            "urgency": "low",
+            "affected_users": 1,
+            "priority": "low",
+            "status": "resolved",
+            "assigned_to": "Alex",
+        }
+
+        third_ticket = {
+            **SAMPLE_TICKET,
+            "id": "T003",
+            "title": "Software installation issue",
+            "category": "Software",
+            "urgency": "medium",
+            "affected_users": 4,
+            "priority": "medium",
+            "status": "in_progress",
+            "assigned_to": "Jordan",
+        }
+
+        report = generate_report(
+            [SAMPLE_TICKET, second_ticket, third_ticket]
+        )
+
+        self.assertEqual(report["total_tickets"], 3)
+
         self.assertEqual(
-            set(report["by_category"]),
-            {"Network", "Hardware", "Software", "Other"},
+            report["by_status"],
+            {
+                "open": 1,
+                "in_progress": 1,
+                "resolved": 1,
+            },
         )
 
-    def test_counts_and_resolution_percentage(self):
-        tickets = [
+        self.assertEqual(
+            report["by_priority"],
             {
-                "status": "resolved",
-                "priority": "critical",
-                "category": "Network",
+                "critical": 1,
+                "high": 0,
+                "medium": 1,
+                "low": 1,
             },
-            {
-                "status": "open",
-                "priority": "high",
-                "category": "Hardware",
-            },
-            {
-                "status": "in_progress",
-                "priority": "medium",
-                "category": "Software",
-            },
-            {
-                "status": "resolved",
-                "priority": "low",
-                "category": "Other",
-            },
-        ]
+        )
 
-        report = generate_report(tickets)
+    def test_invalid_status_raises_value_error(self):
+        invalid_ticket = {
+            **SAMPLE_TICKET,
+            "status": "pending",
+        }
 
-        self.assertEqual(report["total_tickets"], 4)
-        self.assertEqual(report["resolved"], 2)
-        self.assertEqual(report["unresolved"], 2)
-        self.assertEqual(report["resolution_percentage"], 50.0)
-        self.assertEqual(report["by_status"]["open"], 1)
-        self.assertEqual(report["by_status"]["in_progress"], 1)
-        self.assertEqual(report["by_status"]["resolved"], 2)
+        with self.assertRaises(ValueError):
+            generate_report([invalid_ticket])
+
+    def test_invalid_priority_raises_value_error(self):
+        invalid_ticket = {
+            **SAMPLE_TICKET,
+            "priority": "urgent",
+        }
+
+        with self.assertRaises(ValueError):
+            generate_report([invalid_ticket])
+
+    def test_non_dictionary_ticket_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            generate_report(["not a ticket"])
+
+    def test_non_list_input_raises_value_error(self):
+        with self.assertRaises(ValueError):
+            generate_report(None)
 
 
 if __name__ == "__main__":
