@@ -1,4 +1,3 @@
-
 import unittest
 
 from campusflow.tickets import (
@@ -10,7 +9,7 @@ from campusflow.tickets import (
     generate_ticket_id,
     find_ticket,
     create_ticket,
-    validate_ticket
+    validate_ticket,
 )
 
 
@@ -178,6 +177,7 @@ class TestCreateTicket(unittest.TestCase):
             "priority": "critical",
             "status": "open",
             "assigned_to": None,
+            "notes": [],
         })
 
     def test_ticket_is_appended_exactly_once(self):
@@ -213,6 +213,7 @@ class TestCreateTicket(unittest.TestCase):
 
         self.assertEqual(second["id"], "T002")
         self.assertEqual(len(self.tickets), 2)
+
 
 class TestValidateTicket(unittest.TestCase):
 
@@ -251,6 +252,7 @@ class TestValidateTicket(unittest.TestCase):
         self.ticket["status"] = "in_progress"
         with self.assertRaises(ValueError):
             validate_ticket(self.ticket)
+
 
 if __name__ == "__main__":
     unittest.main()
