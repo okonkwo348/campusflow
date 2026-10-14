@@ -1,4 +1,3 @@
-# campusflow/search.py
 
 VALID_CATEGORIES = {"Network", "Hardware", "Software", "Other"}
 VALID_STATUSES = {"open", "in_progress", "resolved"}
@@ -12,8 +11,6 @@ def search_tickets(
     status=None,
     priority=None,
 ):
-    """Return tickets matching the title query and all supplied filters."""
-
     if category is not None and category not in VALID_CATEGORIES:
         raise ValueError("Invalid category.")
 
