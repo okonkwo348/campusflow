@@ -295,7 +295,44 @@ class TestWorkflow(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             build_queue(self.tickets)
+    def test_build_queue_rejects_invalid_ticket_id(self):
+        self.tickets[0]["id"] = "invalid"
+
+        with self.assertRaises(ValueError):
+            build_queue(self.tickets)
+
+    def test_resolved_ticket_cannot_be_reassigned(self):
+        self.tickets[0]["status"] = "resolved"
+        self.tickets[0]["assigned_to"] = "Ada"
+
+        with self.assertRaises(ValueError):
+            assign_ticket(self.tickets, "T001", "Eve")
+
+        # Prove the rejected action changed nothing
+        self.assertEqual(self.tickets[0]["assigned_to"], "Ada")
+        self.assertEqual(self.tickets[0]["status"], "resolved")
+
+    def test_build_queue_excludes_in_progress_tickets(self):
+        self.tickets[0]["status"] = "in_progress"
+        self.tickets[0]["assigned_to"] = "Ada"
+
+        self.tickets.append({
+            "id": "T002",
+            "title": "Software issue",
+            "category": "Software",
+            "urgency": "low",
+            "affected_users": 1,
+            "priority": "low",
+            "status": "open",
+            "assigned_to": None,
+        })
+
+        queue = build_queue(self.tickets)
+
+        self.assertEqual([ticket["id"] for ticket in queue], ["T002"])
 
 
 if __name__ == "__main__":
     unittest.main()
+
+
