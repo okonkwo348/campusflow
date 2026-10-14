@@ -131,3 +131,56 @@ def create_ticket(
 
     tickets.append(new_ticket)
     return new_ticket
+
+TICKET_KEYS = {
+    "id", "title", "category", "urgency", "affected_users",
+    "priority", "status", "assigned_to", "notes",
+}
+VALID_STATUSES = {"open", "in_progress", "resolved"}
+
+
+def validate_ticket(ticket: dict) -> None:
+    """Check one ticket's fields and invariants; raise ValueError if invalid."""
+    if not isinstance(ticket, dict):
+        raise ValueError("A ticket must be a dictionary.")
+
+    if set(ticket.keys()) != TICKET_KEYS:
+        raise ValueError("Ticket has missing or unexpected fields.")
+
+    ticket_id = ticket["id"]
+    if (
+        not isinstance(ticket_id, str)
+        or not ticket_id.startswith("T")
+        or not ticket_id[1:].isdigit()
+        or len(ticket_id) < 4
+    ):
+        raise ValueError("Ticket ID must look like T001.")
+
+    validate_title(ticket["title"])
+
+    if ticket["category"] not in VALID_CATEGORIES:
+        raise ValueError("Category must be Network, Hardware, Software or Other.")
+
+    if ticket["urgency"] not in VALID_URGENCIES:
+        raise ValueError("Urgency must be low, medium or high.")
+
+    validate_affected_users(ticket["affected_users"])
+
+    expected = calculate_priority(ticket["urgency"], ticket["affected_users"])
+    if ticket["priority"] != expected:
+        raise ValueError(
+            f"Priority should be '{expected}' for this urgency and user count."
+        )
+
+    if ticket["status"] not in VALID_STATUSES:
+        raise ValueError("Status must be open, in_progress or resolved.")
+
+    staff = ticket["assigned_to"]
+    if staff is not None and (not isinstance(staff, str) or not staff.strip()):
+        raise ValueError("assigned_to must be a staff name or None.")
+
+    if ticket["status"] == "in_progress" and staff is None:
+        raise ValueError("An in_progress ticket must be assigned.")
+
+    if not isinstance(ticket["notes"], list):
+        raise ValueError("notes must be a list.")
