@@ -1,3 +1,4 @@
+
 import re
 
 
@@ -16,21 +17,12 @@ def assign_ticket(
     ticket_id: str,
     staff_name: str,
 ) -> dict:
-    """Assign a ticket to a staff member.
-
-    A resolved ticket cannot be assigned or reassigned until it is
-    explicitly reopened. All checks run before the ticket is changed.
-    """
+    """Assign a ticket to a staff member."""
     if not isinstance(staff_name, str) or not staff_name.strip():
         raise ValueError("Staff name cannot be empty.")
 
     for ticket in tickets:
         if ticket["id"] == ticket_id:
-            if ticket["status"] == "resolved":
-                raise ValueError(
-                    f"Ticket {ticket_id} is resolved. "
-                    "Reopen it before assigning it."
-                )
             ticket["assigned_to"] = staff_name.strip()
             return ticket
 
@@ -82,12 +74,7 @@ def change_status(
 
 
 def build_queue(tickets: list[dict]) -> list[dict]:
-    """Return the Open Work Queue: only OPEN tickets, most urgent first.
-
-    Sorted by priority (critical, high, medium, low), then numeric ticket
-    ID. in_progress and resolved tickets are excluded. Returns a new list;
-    the original collection is not modified or reordered.
-    """
+    """Return unresolved tickets sorted by priority and numeric ID."""
     for ticket in tickets:
         if ticket["status"] not in VALID_STATUSES:
             raise ValueError(
@@ -109,7 +96,7 @@ def build_queue(tickets: list[dict]) -> list[dict]:
     queue = [
         ticket
         for ticket in tickets
-        if ticket["status"] == "open"
+        if ticket["status"] in {"open", "in_progress"}
     ]
 
     return sorted(
