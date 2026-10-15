@@ -10,14 +10,24 @@
 
 ## 👥 Our Team
 
+CampusFlow was built in two stages. Every collaborator is listed with the role they held in that stage.
+
+### Stage 1 — Original CampusFlow
+
+| No. | Team Member | Role / Contribution |
+|---|---|---|
+| 1 | **OKONKWO EMMANUEL CHISOM** | Project lead / Ticket creation |
+| 2 | **MUHAMMED MARYAM** | Workflow and status management |
+| 3 | **CHRISTAIN PATRICK** | Data persistence and storage |
+
+### Stage 2 — CampusFlow Next (reliability, notes, search and quality upgrade)
+
 | Role | Team Member | Responsibility |
 |---|---|---|
 | **Engineer A** | **AYANDE WUESE JOY** | Ticket safety and storage: validation, assignment and status protection, open-only work queue, follow-up notes (data rules), safe JSON load/save and ID continuity |
 | **Engineer B** | **OKONKWO EMMANUEL CHISOM** | Search, reports and CLI: title search with combined filters, enhanced reports, menu and input handling, note menus, Engineering Understanding Check quiz |
 
-Both engineers agreed the function contracts, wrote code and tests, reviewed each other's pull requests, and documented their AI-assisted learning.
-
-The original CampusFlow version also included contributions from **Muhammed Maryam** and **Christain Patrick**.
+In Stage 2, both engineers agreed the function contracts, wrote code and tests, reviewed each other's pull requests, and documented their AI-assisted learning. Stage 2 builds on the Stage 1 code and keeps all of its original features.
 
 **Project Repository:** https://github.com/okonkwo348/campusflow
 
@@ -31,6 +41,21 @@ The original CampusFlow version also included contributions from **Muhammed Mary
 - Reject invalid actions without changing or losing data.
 - Preserve tickets and notes between sessions.
 - Help staff find tickets quickly and report clearly to the Head of Campus.
+
+---
+
+## 🆕 What CampusFlow Next Adds
+
+| Area | Stage 1 (original) | Stage 2 (CampusFlow Next) |
+|---|---|---|
+| Validation | Basic input checks | Central validation helpers; invalid actions leave all data unchanged |
+| Assignment | Assign a staff member | Resolved tickets cannot be reassigned until reopened |
+| Work queue | Active tickets by priority | **Open tickets only**, by priority then numeric ID |
+| Notes | — | Structured follow-up notes with per-ticket IDs |
+| Search | — | Title search with AND-combined category/status/priority filters |
+| Reports | Totals, status and priority counts | Adds category counts, unresolved/resolved counts and resolution % |
+| JSON | Save and load | Full-file validation, duplicate-ID and note checks, older-file migration |
+| Quiz | — | Engineering Understanding Check (6 questions) |
 
 ---
 
