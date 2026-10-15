@@ -17,8 +17,8 @@ CampusFlow was built in two stages. Every collaborator is listed with the role t
 | No. | Team Member | Role / Contribution |
 |---|---|---|
 | 1 | **OKONKWO EMMANUEL CHISOM** | Project lead / Ticket creation |
-| 2 | **MUHAMMED MARYAM** | Workflow and status management |
-| 3 | **CHRISTAIN PATRICK** | Data persistence and storage |
+| 2 |  **CHRISTAIN PATRICK** | Workflow and status management |
+| 3 | **MUHAMMED MARYAM** | Data persistence and storage |
 
 ### Stage 2 — CampusFlow Next (reliability, notes, search and quality upgrade)
 
