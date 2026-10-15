@@ -61,39 +61,63 @@ QUESTIONS = [
         "answer": "A",
     },
 ]
-
-
+# Replace the existing run_quiz() function in campusflow/engineering_quiz.py
+# with this function. Keep the existing QUESTIONS list unchanged.
 def run_quiz():
     score = 0
+    completed = 0
+    quit_early = False
 
-    print("\nENGINEERING UNDERSTANDING CHECK")
+    print("\\nENGINEERING UNDERSTANDING CHECK")
+    print("Enter Q at any question to quit and return to the menu.")
 
-    for number, question in enumerate(QUESTIONS, start=1):
-        print(f"\n{number}. {question['question']}")
+    try:
+        for number, question in enumerate(QUESTIONS, start=1):
+            print(f"\\n{number}. {question['question']}")
 
-        for letter, option in question["options"].items():
-            print(f"  {letter}. {option}")
+            for letter, option in question["options"].items():
+                print(f"  {letter}. {option}")
 
-        while True:
-            answer = input("Your answer (A/B/C/D): ").strip().upper()
+            while True:
+                answer = input("Your answer (A/B/C/D or Q to quit): ").strip().upper()
 
-            if answer in ("A", "B", "C", "D"):
+                if answer == "Q":
+                    quit_early = True
+                    break
+
+                if answer in ("A", "B", "C", "D"):
+                    break
+
+                print("Invalid choice. Enter A, B, C, D, or Q to quit.")
+
+            if quit_early:
                 break
 
-            print("Invalid choice. Enter A, B, C, or D.")
+            completed += 1
+            if answer == question["answer"]:
+                print("Correct!")
+                score += 1
+            else:
+                print(f"Incorrect. Correct answer: {question['answer']}")
 
-        if answer == question["answer"]:
-            print("Correct!")
-            score += 1
-        else:
-            print(f"Incorrect. Correct answer: {question['answer']}")
+    except (KeyboardInterrupt, EOFError):
+        # Treat Ctrl+C / closed input as a normal early exit.
+        print("\\nQuiz interrupted. Returning to the menu.")
+        quit_early = True
 
-    print(f"\nFinal score: {score}/{len(QUESTIONS)}")
+    if quit_early:
+        print(f"\\nQuiz ended early. Score so far: {score}/{completed}.")
+        return score
+
+    print(f"\\nFinal score: {score}/{len(QUESTIONS)}")
 
     for number in range(1, 3):
-        input(
-            f"Explain one answer in your own words "
-            f"({number}/2): "
-        )
+        try:
+            input(
+                f"Explain one answer in your own words ({number}/2): "
+            )
+        except (KeyboardInterrupt, EOFError):
+            print("\\nExplanation skipped.")
+            break
 
     return score

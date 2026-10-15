@@ -1,4 +1,9 @@
-from campusflow.tickets import create_ticket
+from campusflow.tickets import (
+    create_ticket,
+    validate_title,
+    validate_category,
+    validate_urgency,
+)
 from campusflow.workflow import assign_ticket, change_status, build_queue
 from campusflow.storage import load_tickets, save_tickets
 from campusflow.search import search_tickets
@@ -162,14 +167,57 @@ def main() -> None:
         choice = input("Choose an option (F1-F12): ").strip().upper()
 
         if choice in ("F1", "1"):
-            try:
-                title = input("Ticket title: ")
-                category = input(
-                    "Category (Network, Hardware, Software, Other): "
-                )
-                urgency = input("Urgency (low, medium, high): ")
-                affected_users = int(input("Number of affected users: "))
+            # Validate each field at the point where it is entered so the
+            # user sees the error immediately and can retry that field.
+            while True:
+                try:
+                    title = validate_title(input("Ticket title: "))
+                    break
+                except ValueError as error:
+                    print(f"Invalid title: {error}")
 
+            while True:
+                try:
+                    category = validate_category(input(
+                        "Category (Network, Hardware, Software, Other): "
+                    ))
+                    break
+                except ValueError as error:
+                    print(f"Invalid category: {error}")
+
+            while True:
+                try:
+                    urgency = validate_urgency(
+                        input("Urgency (low, medium, high): ")
+                    )
+                    break
+                except ValueError as error:
+                    print(f"Invalid urgency: {error}")
+
+            while True:
+                affected_users_text = input(
+                    "Number of affected users (positive whole number): "
+                ).strip()
+
+                try:
+                    affected_users = int(affected_users_text)
+                except ValueError:
+                    print(
+                        "Invalid input. Enter a positive whole number, "
+                        "such as 1 or 5."
+                    )
+                    continue
+
+                if affected_users <= 0:
+                    print(
+                        "Invalid input. The number of affected users "
+                        "must be greater than zero."
+                    )
+                    continue
+
+                break
+
+            try:
                 ticket = create_ticket(
                     tickets,
                     title,
@@ -177,7 +225,6 @@ def main() -> None:
                     urgency,
                     affected_users,
                 )
-
                 print(
                     f'Created {ticket["id"]}: {ticket["title"]} '
                     f'(Priority: {ticket["priority"]})'

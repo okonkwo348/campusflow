@@ -14,7 +14,7 @@ MAX_NOTE_LENGTH = 300
 
 
 def validate_title(title: str) -> str:
-    """Return a trimmed, non-empty title."""
+    """Return a trimmed title containing at least one letter."""
     if not isinstance(title, str):
         raise ValueError("Title must be a string.")
 
@@ -23,7 +23,12 @@ def validate_title(title: str) -> str:
     if not title:
         raise ValueError("Title must not be blank. Enter a problem.")
 
+    if not any(character.isalpha() for character in title):
+        raise ValueError("Title must contain at least one letter.")
+
     return title
+
+
 
 
 def validate_category(category: str) -> str:
