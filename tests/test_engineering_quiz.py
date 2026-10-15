@@ -23,7 +23,7 @@ class TestEngineeringQuiz(unittest.TestCase):
         self.assertEqual(mocked_input.call_count, 9)
 
     @patch("builtins.input", side_effect=[
-        "A", "A", "A", "A", "A", "B",
+        "A", "A", "A", "A", "B", "B",
         "Explanation one",
         "Explanation two",
     ])
