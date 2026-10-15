@@ -1,4 +1,3 @@
-
 import unittest
 
 from campusflow.tickets import (
@@ -10,6 +9,7 @@ from campusflow.tickets import (
     generate_ticket_id,
     find_ticket,
     create_ticket,
+    validate_ticket,
 )
 
 
@@ -177,6 +177,7 @@ class TestCreateTicket(unittest.TestCase):
             "priority": "critical",
             "status": "open",
             "assigned_to": None,
+            "notes": [],
         })
 
     def test_ticket_is_appended_exactly_once(self):
@@ -212,6 +213,45 @@ class TestCreateTicket(unittest.TestCase):
 
         self.assertEqual(second["id"], "T002")
         self.assertEqual(len(self.tickets), 2)
+
+
+class TestValidateTicket(unittest.TestCase):
+
+    def setUp(self):
+        self.ticket = {
+            "id": "T001", "title": "Wi-Fi is down", "category": "Network",
+            "urgency": "high", "affected_users": 15, "priority": "critical",
+            "status": "open", "assigned_to": None, "notes": [],
+        }
+
+    def test_valid_ticket_passes(self):
+        self.assertIsNone(validate_ticket(self.ticket))
+
+    def test_created_ticket_passes_validation(self):
+        tickets = []
+        ticket = create_ticket(tickets, "Broken laptop", "hardware", "low", 1)
+        validate_ticket(ticket)
+
+    def test_invalid_values_are_rejected(self):
+        bad_values = [
+            ("category", "Banana"),
+            ("affected_users", True),
+            ("affected_users", 2.5),
+            ("priority", "low"),
+            ("title", "   "),
+            ("status", "pending"),
+        ]
+        for field, value in bad_values:
+            with self.subTest(field=field, value=value):
+                bad = dict(self.ticket)
+                bad[field] = value
+                with self.assertRaises(ValueError):
+                    validate_ticket(bad)
+
+    def test_unassigned_in_progress_ticket_is_rejected(self):
+        self.ticket["status"] = "in_progress"
+        with self.assertRaises(ValueError):
+            validate_ticket(self.ticket)
 
 
 if __name__ == "__main__":
